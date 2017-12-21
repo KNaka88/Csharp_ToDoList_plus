@@ -105,34 +105,6 @@ namespace ToDoList.Models
             return foundCategory;
         }
 
-        public List<Task> GetTasks()
-        {
-            List<Task> allCategoryTasks = new List<Task> {};
-            MySqlConnection conn = DB.Connection();
-            conn.Open();
-            var cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM tasks WHERE category_id = @category_id;";
-
-            MySqlParameter categoryId = new MySqlParameter();
-            categoryId.ParameterName = "@category_id";
-            categoryId.Value = this._id;
-            cmd.Parameters.Add(categoryId);
-
-            var rdr = cmd.ExecuteReader() as MySqlDataReader;
-            while(rdr.Read())
-            {
-                int taskId = rdr.GetInt32(0);
-                string taskDescription = rdr.GetString(1);
-                Task newTask = new Task(taskDescription, taskId);
-                allCategoryTasks.Add(newTask);
-            }
-            conn.Close();
-            if (conn != null)
-            {
-                conn.Dispose();
-            }
-            return allCategoryTasks;
-        }
 
         public void Save()
         {
@@ -174,6 +146,103 @@ namespace ToDoList.Models
         public override int GetHashCode()
         {
             return this.GetName().GetHashCode();
+        }
+
+        public void Delete()
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+
+            MySqlCommand cmd = new MySqlCommand("DELETE FROM categories WHERE id = @CategoryId; DELETE FROM categories_tasks WHERE category_id = @CategoryId;", conn);
+
+            MySqlParameter categoryIdParameter = new MySqlParameter();
+            categoryIdParameter.ParameterName = "@CategoryId";
+            categoryIdParameter.Value = this.GetId();
+
+
+            cmd.Parameters.Add(categoryIdParameter);
+            cmd.ExecuteNonQuery();
+
+            if (conn != null)
+            {
+                conn.Close();
+            }
+        }
+
+        public void AddTask(Task newTask)
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            var cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"INSERT INTO categories_tasks (category_id, task_id) VALUES (@categoryId, @taskId);";
+
+            MySqlParameter category_id = new MySqlParameter();
+            category_id.ParameterName = "@categoryId";
+            category_id.Value = _id;
+            cmd.Parameters.Add(category_id);
+
+            MySqlParameter task_id = new MySqlParameter();
+            task_id.ParameterName = "@TaskId";
+            task_id.Value = newTask.GetId();
+            cmd.Parameters.Add(task_id);
+
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
+        }
+
+        public List<Task> GetTasks()
+        {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            var cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"SELECT task_id FROM categories_tasks WHERE category_id = @categoryId;";
+
+            MySqlParameter categoryIdParameter = new MySqlParameter();
+            categoryIdParameter.ParameterName = "@categoryId";
+            categoryIdParameter.Value = _id;
+            cmd.Parameters.Add(categoryIdParameter);
+
+            var rdr = cmd.ExecuteReader() as MySqlDataReader;
+
+            List<int> taskIds = new List<int> {};
+            while(rdr.Read())
+            {
+                int taskId = rdr.GetInt32(0);
+                taskIds.Add(taskId);
+            }
+            rdr.Dispose();
+
+            List<Task> tasks = new List<Task>{};
+            foreach (int taskId in taskIds)
+            {
+                var taskQuery = conn.CreateCommand() as MySqlCommand;
+                taskQuery.CommandText = @"SELECT * FROM tasks WHERE id = @TaskId;";
+
+                MySqlParameter taskIdParameter = new MySqlParameter();
+                taskIdParameter.ParameterName = "@TaskId";
+                taskIdParameter.Value = taskId;
+                taskQuery.Parameters.Add(taskIdParameter);
+
+                var taskQueryRdr = taskQuery.ExecuteReader() as MySqlDataReader;
+                while(taskQueryRdr.Read())
+                {
+                    int thisTaskId = taskQueryRdr.GetInt32(0);
+                    string taskDescription = taskQueryRdr.GetString(1);
+                    Task foundTask = new Task(taskDescription, thisTaskId);
+                    tasks.Add(foundTask);
+                }
+                taskQueryRdr.Dispose();
+            }
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
+            return tasks;
         }
     }
 }
