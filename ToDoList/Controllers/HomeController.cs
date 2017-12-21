@@ -116,5 +116,19 @@ namespace ToDoList.Controllers
           return View();
       }
 
+      [HttpGet("/tasks/{id}/edit")]
+      public ActionResult TaskEdit(int id)
+      {
+          Task thisTask = Task.Find(id);
+          return View(thisTask);
+      }
+
+      [HttpPost("/tasks/{id}/edit")]
+      public ActionResult TaskEditConfirm(int id)
+      {
+          Task thisTask = Task.Find(id);
+          thisTask.UpdateDescription(Request.Form["newname"]);
+          return RedirectToAction("Index");
+      }
   }
 }
