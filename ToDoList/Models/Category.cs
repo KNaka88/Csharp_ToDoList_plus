@@ -123,8 +123,7 @@ namespace ToDoList.Models
             {
                 int taskId = rdr.GetInt32(0);
                 string taskDescription = rdr.GetString(1);
-                int taskCategoryId = rdr.GetInt32(2);
-                Task newTask = new Task(taskDescription, taskCategoryId, taskId);
+                Task newTask = new Task(taskDescription, taskId);
                 allCategoryTasks.Add(newTask);
             }
             conn.Close();
