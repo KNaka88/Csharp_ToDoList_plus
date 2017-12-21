@@ -163,5 +163,10 @@ namespace ToDoList.Models
                 conn.Dispose();
             }
         }
+
+        public void UpdateDescription(string newDescription)
+        {
+          
+        }
     }
 }

@@ -85,6 +85,24 @@ namespace ToDoList.Tests
             Assert.AreEqual(testTask, foundTask);
 
         }
+
+        [TestMethod]
+        public void Update_UpdatesTaskInDatabase_String()
+        {
+            // Arrange
+            string firstDescription = "Walk the Dog";
+            Task testTask = new Task(firstDescription, 1);
+            testTask.Save();
+            string secondDescription = "Mow the lawn";
+
+            // Act
+            testTask.UpdateDescription(secondDescription);
+
+            string result = Task.Find(testTask.GetId()).GetDescription();
+
+            // Assert
+            Assert.AreEqual(secondDescription, result);
+        }
     }
 }
 
