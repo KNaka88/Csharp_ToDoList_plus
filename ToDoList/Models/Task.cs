@@ -193,7 +193,23 @@ namespace ToDoList.Models
 
         public void Delete()
         {
+            MySqlConnection conn = DB.Connection();
+            conn.Open();
+            var cmd = conn.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"DELETE from tasks WHERE id = @id;";
 
+            MySqlParameter thisId = new MySqlParameter();
+            thisId.ParameterName = "@id";
+            thisId.Value = _id;
+            cmd.Parameters.Add(thisId);
+
+            cmd.ExecuteNonQuery();
+
+            conn.Close();
+            if (conn != null)
+            {
+                conn.Dispose();
+            }
         }
     }
 }
