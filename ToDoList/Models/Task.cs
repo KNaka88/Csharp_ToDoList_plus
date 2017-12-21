@@ -190,5 +190,10 @@ namespace ToDoList.Models
                 conn.Dispose();
             }
         }
+
+        public void Delete()
+        {
+
+        }
     }
 }

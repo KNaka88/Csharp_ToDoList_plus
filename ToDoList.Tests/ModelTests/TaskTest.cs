@@ -103,6 +103,23 @@ namespace ToDoList.Tests
             // Assert
             Assert.AreEqual(secondDescription, result);
         }
+
+        [TestMethod]
+        public void Delete_DeleteTaskFromDatabase()
+        {
+            // Arrange
+            string firstDescription = "Walk the Dog";
+            Task testTask = new Task(firstDescription, 1);
+            testTask.Save();
+            int taskId = testTask.GetId();
+
+            // Act
+            testTask.Delete();
+            int result = Task.Find(taskId).GetId();
+
+            // Assert
+            Assert.AreEqual(0, result);
+        }
     }
 }
 
