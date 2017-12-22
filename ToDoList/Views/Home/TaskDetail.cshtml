@@ -17,7 +17,7 @@
 @if (Model["allCategories"].Count != 0)
 {
   <h4>Add a category to this task:</h4>
-  <form action=($'/tasks/@Model["task"].GetId()/categories/new') method='post'>
+  <form action='/tasks/@Model["task"].GetId()/categories/new' method='post'>
     <label for='category-id'>Select a category</label>
     <select id='category-id' name='category-id' type='text'>
       @foreach (var category in @Model["allCategories"])
