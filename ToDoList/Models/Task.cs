@@ -135,7 +135,6 @@ namespace ToDoList.Models
 
             var cmd = conn.CreateCommand() as MySqlCommand;
             cmd.CommandText = @"INSERT INTO tasks (description) VALUES (@description);";
-
             MySqlParameter description = new MySqlParameter();
             description.ParameterName = "@description";
             description.Value = this._description;
